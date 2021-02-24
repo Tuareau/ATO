@@ -1,11 +1,11 @@
 #include "header.h"
-#include "select.h" // для find_node()
+#include "select.h" // find_node()
 
-// изменение направления, времени, стоимости полета
+// change of direction, time, cost of flight
 void change(char *, char *, int);
-// получение информации для изменения
+// getting information to change
 void get_to_change(int);
-// изменение пункта отправления самолета
+// change of the departure point of the aircraft
 void change_base(char *, char *);
 
 void change_rec(void)
@@ -24,12 +24,10 @@ void change_rec(void)
 		printf("5 - Change cost\n");
 		if (scanf_s("%d", &c) != 1)
 		{
-			// очищение потока ввода
 			while (getchar() != '\n');
 			printf("\nError: invalid input\n");
 			break;
 		}
-		// очищение потока ввода
 		while (getchar() != '\n');
 
 		system("cls");
@@ -68,12 +66,9 @@ void get_to_change(int cond)
 	printf("Be careful!\n");
 	printf("End the input by using EOF\n");
 
-	// ввод пункта отправления изменяемого полета
 	while (scanf_s("%s", base, LEN) && base[0] != EOF)
 	{
-		// ввод пункта назначения
 		scanf_s("%s", dest, LEN);
-		// вызов функции в зависимости от условия изменения
 		if (cond)
 			change(base, dest, cond);
 		else
@@ -81,8 +76,8 @@ void get_to_change(int cond)
 	}
 }
 
-// изменение направления, времени и стоимости
-// изменение выбирается в зависимости от параметра option
+// change of direction, time and cost
+// change is selected depending on the option parameter
 void change(char *base, char *dest, int option)
 {
 	char newarr[LEN];
@@ -92,7 +87,8 @@ void change(char *base, char *dest, int option)
 	char tmp[1];
 
 	enum {DIRECT = 1, TIME, COST};
-	// получение новых данных о полете
+
+	// get new data about the flight
 	switch (option)
 	{
 	case DIRECT:
@@ -117,11 +113,10 @@ void change(char *base, char *dest, int option)
 		break;
 	}
 
-	// внесение данных в базу
+	// adding data to the database
 	int changed = 0;
 	if (graph)
 	{
-		// поиск самолета
 		struct Plane **plane;
 		for (plane = graph; plane <= last_plane; plane++)
 		{
@@ -129,13 +124,11 @@ void change(char *base, char *dest, int option)
 			{
 				if ((*plane)->direct_tab)
 				{
-					// поиск полета
 					struct Direct **direct;
 					for (direct = (*plane)->direct_tab; direct <= (*plane)->last_direct; direct++)
 					{
 						if (strcmp((*direct)->aim, dest) == 0)
 						{
-							// изменение данных
 							switch (option)
 							{
 							case DIRECT:
@@ -155,7 +148,6 @@ void change(char *base, char *dest, int option)
 						}
 							
 					}
-					// прерывание поиска самолета при успешном изменении
 					if (changed) 
 						break;
 					if (direct > (*plane)->last_direct)
@@ -172,24 +164,24 @@ void change(char *base, char *dest, int option)
 	return;
 }
 
-// изменение самолета одного авиарейса
-// если имеется, переносит полет к нему
-// если новый, то выделяет память под новый
+// changing the plane of one flight
+// if available, transfers the flight to it
+// if new, allocates memory for the new one
 void change_base(char *base, char *dest)
 {
 	char newbase[LEN];
 	printf("Put a new base for %s-%s flight: ", base, dest);
 	scanf_s("%s", newbase, LEN);
 
-	// флаг: 1, если новый самолет найден в базе
+	// flag: 1, if a new plane is found in the database
 	int found_new = 0;
-	// если не одинаковые имена (изменение нужно)
+
 	if ((strcmp(base, newbase) != 0) && graph)
 	{
 		struct Plane **old_plane;
 		struct Direct **old_aim;
 
-		// поиск изменяемого пути: самолет
+		// search for a changeable path: airplane
 		for (old_plane = graph; old_plane <= last_plane; old_plane++)
 			if (strcmp((*old_plane)->base, base) == 0)
 				break;
@@ -198,7 +190,8 @@ void change_base(char *base, char *dest)
 			printf("You were mistaken, no old base like this: \"%s\"\n", base);
 			return;
 		}
-		// поиск изменяемого пути: полет
+
+		// search for a changeable path: flight
 		if ((*old_plane)->direct_tab)
 		{
 			for (old_aim = (*old_plane)->direct_tab; old_aim <= (*old_plane)->last_direct; old_aim++)
@@ -216,7 +209,6 @@ void change_base(char *base, char *dest)
 			return;
 		}
 
-		// поиск измененного самолета в базе
 		struct Plane **new_plane;
 		for (new_plane = graph; new_plane < last_plane; new_plane++)
 		{
@@ -226,30 +218,26 @@ void change_base(char *base, char *dest)
 			}
 		}
 
-		// если новый самолет найден среди имеющихся
-		// данные полета переносятся к нему
-		// иначе выделяется память под новый самолет и переносится к новому
+		// if a new aircraft is found among the existing ones
+		// flight data is transferred to it
+		// otherwise, the memory is allocated for the new plane and transferred to the new one
 		if (found_new)
 		{
-			// расширение массива указателей на полеты
 			if ((*new_plane)->directs == (*new_plane)->dir_p_amount)
 			{
 				(*new_plane)->dir_p_amount += SIZE;
 				(*new_plane)->direct_tab = (struct Direct **)realloc((*new_plane)->direct_tab, 
 					(*new_plane)->dir_p_amount * sizeof(struct Direct *));
-				int j = (*new_plane)->directs; // для сокращения записи
+				int j = (*new_plane)->directs;
 				memset(&((*new_plane)->direct_tab[j]), 0, SIZE * sizeof(struct Direct *));
 			}
 			(*new_plane)->last_direct = (*new_plane)->direct_tab;
 			(*new_plane)->last_direct += (*new_plane)->directs;
 			(*new_plane)->directs++;
 
-			// выделение памяти под полет
 			struct Direct *new_direct;
 			*((*new_plane)->last_direct) = (struct Direct *)malloc(sizeof(struct Direct));
-			// указатель на полет
 			new_direct = *((*new_plane)->last_direct);
-			// копирование данных
 			new_direct->cost = (*old_aim)->cost;
 			new_direct->arrive = (*old_aim)->arrive;
 			new_direct->depart = (*old_aim)->depart;
@@ -258,7 +246,6 @@ void change_base(char *base, char *dest)
 		}
 		else
 		{
-			// расширение массива указателей на самолеты
 			if (size == p_amount)
 			{
 				p_amount += SIZE;
@@ -269,25 +256,21 @@ void change_base(char *base, char *dest)
 			last_plane += size;
 			size++;
 
-			// выделение памяти под самолет
 			*last_plane = (struct Plane *)malloc(sizeof(struct Plane));
 			strcpy_s((*last_plane)->base, LEN, newbase);
 			printf("Record \"%s\" was added successfuly\n", newbase);
-			// обнуление количества полетов
+			// Г®ГЎГ­ГіГ«ГҐГ­ГЁГҐ ГЄГ®Г«ГЁГ·ГҐГ±ГІГўГ  ГЇГ®Г«ГҐГІГ®Гў
 			(*last_plane)->directs = (*last_plane)->dir_p_amount = 0;
 
-			// выделение памяти под указатель на полет, обязательно являющийся первым
 			(*last_plane)->direct_tab = (struct Direct **)malloc(sizeof(struct Direct *));
 			(*last_plane)->last_direct = (*last_plane)->direct_tab;
 			(*last_plane)->directs++;
 			(*last_plane)->dir_p_amount++;
 
-			// выделение памяти под полет
 			struct Direct *new_direct;
 			(*last_plane)->direct_tab[0] = (struct Direct *)malloc(sizeof(struct Direct));
 			new_direct = (*last_plane)->direct_tab[0];
 
-			// копирование данных полета
 			new_direct->cost = (*old_aim)->cost;
 			new_direct->arrive = (*old_aim)->arrive;
 			new_direct->depart = (*old_aim)->depart;
@@ -296,8 +279,7 @@ void change_base(char *base, char *dest)
 			
 		}
 
-		// удаление старого полета
-		// если был единственный полет
+		// deleting an old flight
 		if ((*old_plane)->last_direct == (*old_plane)->direct_tab) 
 		{
 			free(*old_aim);
@@ -306,16 +288,12 @@ void change_base(char *base, char *dest)
 		}
 		else
 		{
-			// освобождение памяти старого полета
 			free(*old_aim);
 			*old_aim = *((*old_plane)->last_direct);
 			*((*old_plane)->last_direct) = NULL;
-			// уменьшение указателя на последний
 			(*old_plane)->last_direct--;
 		}
-		// уменьшение числа полетов старого самолета
 		(*old_plane)->directs--;
-		// уменьшение числа указатедей в массиве в старом самолете
 		(*old_plane)->dir_p_amount--;
 
 	}
