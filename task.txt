@@ -1,7 +1,7 @@
-База данных "Авиакасса"
+ATO database
 
-- пополнение базы
-- редактирование базы
-- удаление записей
-- подбор маршрута с наименьшим временем ожидания при пересадке
-- подбор маршрута с наименьшей стоимостью
+- replenishment of the database
+- editing the database
+- deleting records
+- selection of the route with the shortest waiting time for a transfer
+- selection of the route with the lowest cost
