@@ -1,6 +1,6 @@
 #include "header.h"
 
-// заполнение данных о полетах
+// filling in flight data
 void set_rec(void);
 
 void add_rec(void)
@@ -15,7 +15,7 @@ void add_rec(void)
 
 	while (scanf_s("%s", base, LEN) && base[0] != EOF)
 	{
-		// расширение массива указателей
+		// expanding array of pointers
 		if (size == p_amount)
 		{
 			p_amount += SIZE;
@@ -26,22 +26,20 @@ void add_rec(void)
 		last_plane += size;
 		size++;
 
-		// выделение памяти под полет
+		// memory allocation for flight
 		*last_plane = (struct Plane *)malloc(sizeof(struct Plane));
-		// запись пункта отправления
+		// entry of the point of departure
 		strcpy_s((*last_plane)->base, LEN, base);
 		printf("Record \"%s\" was added successfuly\n", base);
-		// инициализация содержимого структуры
+		// initialize the contents of the structure
 		(*last_plane)->direct_tab = NULL;
 		(*last_plane)->last_direct = NULL;
 		(*last_plane)->directs = (*last_plane)->dir_p_amount = 0;
 	}
-	// заполнение данных о полетах
 	set_rec();
 	return;
 }
 
-// заполнение данных о полетах
 void set_rec(void)
 {	
 	if (!graph)
@@ -59,28 +57,27 @@ void set_rec(void)
 
 	while (scanf_s("%s", base, LEN) && base[0] != EOF)
 	{
-		// ввод данных о полете
 		scanf_s("%s", dest, LEN);
 		char buf[1];
 		scanf_s("%s", hours, 3);
 		scanf_s("%s", buf, 1);
 		scanf_s("%s", mins, 3);
-		// преобразование времени в одину переменную float
+
 		dep = convert_time(hours, mins);
 		scanf_s("%s", hours, 3);
 		scanf_s("%s", buf, 1);
 		scanf_s("%s", mins, 3);
-		// преобразование времени в одину переменную float
+
 		arr = convert_time(hours, mins);
 		scanf_s("%d", &cost);
 
-		// поиск самолета по пункту отправления
+		// search for an airplane by departure point
 		struct Plane **plane;
 		for (plane = graph; plane <= last_plane; plane++)
 		{
 			if (strcmp((*plane)->base, base) == 0)
 			{
-				// расширение массива указателей на полеты
+				// expanding the array of flight pointers
 				if ((*plane)->directs == (*plane)->dir_p_amount)
 				{
 					(*plane)->dir_p_amount += SIZE;
@@ -92,7 +89,6 @@ void set_rec(void)
 				(*plane)->last_direct += (*plane)->directs;
 				(*plane)->directs++;
 
-				// выделение памяти под полет и заполнение данными
 				*((*plane)->last_direct) = (struct Direct *)malloc(sizeof(struct Direct));
 				(*((*plane)->last_direct))->cost = cost;
 				(*((*plane)->last_direct))->arrive = arr;
@@ -108,7 +104,7 @@ void set_rec(void)
 	return;
 }
 
-// конвертирование времени во float
+// convert time to float
 float convert_time(char *hour, char *min)
 {
 	float hours, mins;
@@ -129,23 +125,18 @@ float convert_time(char *hour, char *min)
 	return (hours + mins);
 }
 
-// вывод всего содержимого базы данных
 void print_graph(void)
 {
 	printf("\nDATABASE:\n\n");
 
-	// проверка массива на пустоту
 	if (graph)
 	{
-		// перебор указателей на указатели на самолеты
 		struct Plane **plane;
 		for (plane = graph; plane <= last_plane; plane++)
 		{
 			printf("%s:\n", (*plane)->base);
-			// проверка массива указателей на полеты на пустоту
 			if ((*plane)->direct_tab)
 			{
-				// перебор указателей на указатели на полеты
 				struct Direct **direct;
 				for (direct = (*plane)->direct_tab; direct <= (*plane)->last_direct; direct++)
 					printf("-) to %s for %d pounds\n", (*direct)->aim, (*direct)->cost);
