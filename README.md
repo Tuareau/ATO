@@ -1,12 +1,12 @@
 # ato
 Airplane Tickets Office
 
-## 1. Introduction:
+## 1. Introduction
 
 The developed software product is designed for storing and processing data in the transport sector: it creates a database of aircraft and flights between cities and has the following functionality: storing, adding, deleting and changing information about flights; selecting a route from one city to another with the lowest cost; selecting a route that takes the least time to transfer.
 The program is designed for the Windows operating system. Despite the fact that the size of the required memory depends on the amount of information stored in the database, it does not require large amounts of memory for its operation, since one unit of information (record) in the database occupies 576 bytes (with 10 flights entered). With a large margin, you can set limits of 100 MB of RAM and disk space.
 
-## 2. Course design assignment:
+## 2. Course design assignment
 
 * Replenishment of the database
 * Edit the database
